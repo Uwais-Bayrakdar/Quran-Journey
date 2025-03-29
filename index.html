@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qur'an Journey</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            flex-grow: 1;
+        }
+        header {
+            background-color: #1d3557;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .greeting-section, .progress-section, .next-steps-section, .motivation-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .greeting-section {
+            text-align: center;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 80px;
+            text-align: center;
+        }
+        button {
+            background-color: #1d3557;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2a4a73;
+        }
+        .progress-bar-container {
+            background-color: #e9ecef;
+            height: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #4caf50;
+            border-radius: 15px;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .motivation-card {
+            background-color: #f0f7ff;
+            border-left: 4px solid #1d3557;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        .hidden {
+            display: none;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #1d3557;
+            color: white;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Qur'an Journey</h1>
+        <p>Track your progress and stay motivated</p>
+    </header>
+
+    <div class="container">
+        <div class="greeting-section" id="greeting-section">
+            <h2>Assalamu Alaikum!</h2>
+            <p>Welcome to your Qur'an Journey. Let's keep track of your progress.</p>
+            <div class="input-group">
+                <label for="juz-completed">How many Juz' have you completed?</label>
+                <br>
+                <input type="number" id="juz-completed" min="0" max="30" value="0">
+                <button id="submit-juz">Submit</button>
+            </div>
+        </div>
+
+        <div class="progress-section hidden" id="progress-section">
+            <h2>Your Progress</h2>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar">0%</div>
+            </div>
+            <p id="progress-text">You've completed 0% of the Qur'an!</p>
+        </div>
+
+        <div class="next-steps-section hidden" id="next-steps-section">
+            <h2>Your Next Step</h2>
+            <p id="next-juz-text">Your next Juz' is: <span id="next-juz">1</span></p>
+            <p>This Juz' begins with Surah: <span id="start-surah">Al-Fatiha</span></p>
+            <p id="juz-info"></p>
+        </div>
+
+        <div class="motivation-section hidden" id="motivation-section">
+            <h2>Daily Inspiration</h2>
+            <div class="motivation-card" id="motivation-card">
+                <p id="motivation-text"></p>
+                <p id="motivation-source"></p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Qur'an Journey &copy; 2025</p>
+    </footer>
+
+    <script>
+        // Juz' information (starting Surahs and additional info)
+        const juzInfo = [
+            { startSurah: "Al-Fatiha (1)", info: "Begins with Surah Al-Fatiha and continues into Al-Baqarah" },
+            { startSurah: "Al-Baqarah (2:142)", info: "Continues with Surah Al-Baqarah" },
+            { startSurah: "Al-Baqarah (2:253)", info: "Ends with Al-Baqarah and begins Al-Imran" },
+            { startSurah: "Al-Imran (3:92)", info: "Continues with Surah Al-Imran and ends with An-Nisa" },
+            { startSurah: "An-Nisa (4:24)", info: "Continues with Surah An-Nisa" },
+            { startSurah: "An-Nisa (4:148)", info: "Ends with An-Nisa and begins Al-Ma'idah" },
+            { startSurah: "Al-Ma'idah (5:82)", info: "Ends with Al-Ma'idah and begins Al-An'am" },
+            { startSurah: "Al-An'am (6:111)", info: "Continues with Surah Al-An'am" },
+            { startSurah: "Al-A'raf (7:88)", info: "Includes parts of Surah Al-A'raf" },
+            { startSurah: "Al-Anfal (8:41)", info: "Includes Al-Anfal and At-Tawbah" },
+            { startSurah: "At-Tawbah (9:93)", info: "Continues with At-Tawbah and includes Yunus" },
+            { startSurah: "Hud (11:6)", info: "Begins with Surah Hud" },
+            { startSurah: "Yusuf (12:53)", info: "Includes parts of Surah Yusuf and Ar-Ra'd" },
+            { startSurah: "Al-Hijr (15:1)", info: "Begins with Surah Al-Hijr" },
+            { startSurah: "Al-Isra (17:1)", info: "Begins with Surah Al-Isra" },
+            { startSurah: "Al-Kahf (18:75)", info: "Continues with Surah Al-Kahf" },
+            { startSurah: "Al-Anbiya (21:1)", info: "Begins with Surah Al-Anbiya" },
+            { startSurah: "Al-Mu'minun (23:1)", info: "Begins with Surah Al-Mu'minun" },
+            { startSurah: "Al-Furqan (25:21)", info: "Begins with Surah Al-Furqan" },
+            { startSurah: "An-Naml (27:56)", info: "Includes parts of Surah An-Naml" },
+            { startSurah: "Al-'Ankabut (29:45)", info: "Includes parts of Surah Al-'Ankabut" },
+            { startSurah: "Al-Ahzab (33:31)", info: "Includes parts of Surah Al-Ahzab" },
+            { startSurah: "Ya-Sin (36:28)", info: "Includes parts of Surah Ya-Sin" },
+            { startSurah: "Az-Zumar (39:32)", info: "Includes parts of Surah Az-Zumar" },
+            { startSurah: "Fussilat (41:47)", info: "Includes parts of Surah Fussilat" },
+            { startSurah: "Al-Ahqaf (46:1)", info: "Begins with Surah Al-Ahqaf" },
+            { startSurah: "Adh-Dhariyat (51:31)", info: "Includes parts of Surah Adh-Dhariyat" },
+            { startSurah: "Al-Mujadila (58:1)", info: "Begins with Surah Al-Mujadila" },
+            { startSurah: "Al-Mulk (67:1)", info: "Begins with Surah Al-Mulk" },
+            { startSurah: "An-Naba (78:1)", info: "Begins with Surah An-Naba and continues to the end of the Qur'an" }
+        ];
+
+        // Motivational quotes from the Qur'an and Hadith
+        const motivationalQuotes = [
+            { text: "Indeed, with hardship comes ease.", source: "Qur'an 94:6" },
+            { text: "And whoever relies upon Allah - then He is sufficient for him.", source: "Qur'an 65:3" },
+            { text: "So remember Me; I will remember you.", source: "Qur'an 2:152" },
+            { text: "The best of you are those who learn the Qur'an and teach it.", source: "Hadith, Sahih Bukhari" },
+            { text: "Allah does not burden a soul beyond that it can bear.", source: "Qur'an 2:286" },
+            { text: "Verily, in the remembrance of Allah do hearts find rest.", source: "Qur'an 13:28" },
+            { text: "He who treads a path in search of knowledge, Allah will make easy for him the path to Paradise.", source: "Hadith, Sahih Muslim" },
+            { text: "And when the Qur'an is recited, then listen to it and pay attention that you may receive mercy.", source: "Qur'an 7:204" },
+            { text: "The most beloved of deeds to Allah are those that are most consistent, even if they are small.", source: "Hadith, Sahih Bukhari and Muslim" },
+            { text: "And We have certainly made the Qur'an easy to remember. So is there anyone who will be mindful?", source: "Qur'an 54:17" }
+        ];
+
+        // Tips for Qur'an reading
+        const quranTips = [
+            { text: "Set a consistent time each day for your Qur'an reading.", source: "Reading Tip" },
+            { text: "Start with a small, achievable goal like one page or half a page daily.", source: "Reading Tip" },
+            { text: "Try to understand the meaning of what you read. Use translations and tafsir resources.", source: "Reading Tip" },
+            { text: "Read with proper tajweed. Consider taking lessons or using apps to improve.", source: "Reading Tip" },
+            { text: "Listen to recitations by skilled reciters to improve your own recitation.", source: "Reading Tip" },
+            { text: "Reflect on the verses you read and how they apply to your life.", source: "Reading Tip" },
+            { text: "Create a distraction-free environment when reading the Qur'an.", source: "Reading Tip" },
+            { text: "Join a study circle or find a partner to read with for accountability.", source: "Reading Tip" },
+            { text: "Make dua before reading, asking Allah for understanding and guidance.", source: "Reading Tip" },
+            { text: "Consistency is better than quantity. Read regularly, even if it's a small amount.", source: "Reading Tip" }
+        ];
+
+        // Combined array for daily inspiration
+        const allInspirations = [...motivationalQuotes, ...quranTips];
+
+        // DOM elements
+        const submitButton = document.getElementById('submit-juz');
+        const juzInput = document.getElementById('juz-completed');
+        const progressSection = document.getElementById('progress-section');
+        const nextStepsSection = document.getElementById('next-steps-section');
+        const motivationSection = document.getElementById('motivation-section');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const nextJuz = document.getElementById('next-juz');
+        const startSurah = document.getElementById('start-surah');
+        const juzInfoText = document.getElementById('juz-info');
+        const motivationText = document.getElementById('motivation-text');
+        const motivationSource = document.getElementById('motivation-source');
+
+        // Load saved progress if available
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedJuz = localStorage.getItem('juzCompleted');
+            if (savedJuz !== null) {
+                juzInput.value = savedJuz;
+                updateProgress(parseInt(savedJuz));
+            }
+            showDailyInspiration();
+        });
+
+        // Handle submit button click
+        submitButton.addEventListener('click', () => {
+            const juzCompleted = parseInt(juzInput.value);
+            if (isNaN(juzCompleted) || juzCompleted < 0 || juzCompleted > 30) {
+                alert('Please enter a valid number between 0 and 30');
+                return;
+            }
+            updateProgress(juzCompleted);
+            localStorage.setItem('juzCompleted', juzCompleted);
+        });
+
+        // Update progress display
+        function updateProgress(juzCompleted) {
+            // Calculate percentage
+            const percentage = (juzCompleted / 30) * 100;
+            
+            // Update progress bar
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${percentage.toFixed(1)}%`;
+            
+            // Update progress text
+            progressText.textContent = `You've completed ${percentage.toFixed(1)}% of the Qur'an!`;
+            
+            // Show progress section
+            progressSection.classList.remove('hidden');
+            
+            // Update next steps if not completed
+            if (juzCompleted < 30) {
+                const nextJuzNum = juzCompleted + 1;
+                nextJuz.textContent = nextJuzNum;
+                startSurah.textContent = juzInfo[nextJuzNum - 1].startSurah;
+                juzInfoText.textContent = juzInfo[nextJuzNum - 1].info;
+                nextStepsSection.classList.remove('hidden');
+            } else {
+                // All Juz' completed
+                nextStepsSection.classList.add('hidden');
+                progressText.textContent = `MashaAllah! You've completed the entire Qur'an! Consider starting again for deeper understanding.`;
+            }
+            
+            // Show motivation section
+            motivationSection.classList.remove('hidden');
+        }
+
+        // Show daily inspiration
+        function showDailyInspiration() {
+            // Get a random quote or tip
+            const randomIndex = Math.floor(Math.random() * allInspirations.length);
+            const inspiration = allInspirations[randomIndex];
+            
+            // Update the text
+            motivationText.textContent = inspiration.text;
+            motivationSource.textContent = `— ${inspiration.source}`;
+        }
+    </script>
+</body>
+</html>
